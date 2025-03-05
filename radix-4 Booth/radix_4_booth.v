@@ -3,7 +3,6 @@ module radix_4_booth #(
     parameter multiplicand = 8'h55  //固定被乘数
 )(
     input [WIDTH-1:0] multiplier,
-    input enable,
 
     output wire [2*WIDTH-1:0] Result
 );
@@ -78,7 +77,7 @@ module radix_4_booth #(
         end
     endgenerate
 
-    assign Result = enable ? final_sum : {2*WIDTH{1'b0}};
+    assign Result = final_sum;
     
 
     function [2:0] op_mode;
