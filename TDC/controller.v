@@ -8,6 +8,9 @@ module controller(
     input [1:0] gpio2_io_o,
     output reg [1:0] gpio_io_i,
 
+    //Booth
+    output reg finish,
+
     //RAM Port
     output clkb,
     input [31:0] rd_data,
@@ -48,6 +51,7 @@ always @(posedge sys_clk) begin
             web     <=  4'd0;
             rdy     <=  0;
             full    <=  0;
+            finish  <=  0;      //添加finish信号
         end
         IDLE        :   begin
             if(run)begin
@@ -63,6 +67,8 @@ always @(posedge sys_clk) begin
             rdy     <=  1;
         end
         RUNNING     :   begin
+            finish  <=  0;      //在running阶段，应保持booth操作数稳定，故finish置0
+
             if(addrb    ==  15'b111_1111_1111_1100)begin
                 state   <=  RUN_DONE;
                 full    <=  1;
@@ -82,6 +88,8 @@ always @(posedge sys_clk) begin
                 state   <=  INIT;
         end
         CLEAR       :   begin
+            finish  <=  1;          //在bram清零阶段，将finish信号置一，以提前改变booth乘法器的操作数
+
             rdy     <=  0;
             datab   <=  0;
             if(addrb    ==  15'b111_1111_1111_1100)begin
