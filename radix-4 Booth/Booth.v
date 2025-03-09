@@ -1,17 +1,18 @@
-module Booth(
+module Booth #(
+    parameter WIDTH = 32
+)(
     input clk,
     input rst_n,
     input finish,
-    
-    output [63:0] result
+    output [(WIDTH*2)-1:0] result
 );
 
     // 12个时钟周期的计数器
     reg [3:0] counter;
-    reg [31:0] mult_input;
+    reg [WIDTH-1:0] mult_input;
 
     // 内部操作数寄存器及finish信号同步逻辑
-    reg [31:0] operator;
+    reg [WIDTH-1:0] operator;
     reg meta_finish, meta_finish_2;
     wire change;
 
@@ -24,7 +25,7 @@ module Booth(
     // operator自增逻辑
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            operator <= 32'd0;
+            operator <= 0;
         end else begin
             if(change)
                 operator <= operator + 1;
@@ -48,17 +49,17 @@ module Booth(
     // 控制乘数输入
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            mult_input <= 32'd0;
+            mult_input <= 0;
         end else if(counter == 4'd0) begin
             mult_input <= operator;
         end else begin
-            mult_input <= 32'd0;
+            mult_input <= 0;
         end
     end
 
     // 实例化radix-4 Booth乘法器
     radix_4_booth #(
-        .WIDTH(32),
+        .WIDTH(WIDTH),
         .multiplicand(32'h55555555)  // 固定被乘数
     ) u_radix_4_booth (
         .multiplier(mult_input),
