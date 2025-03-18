@@ -75,8 +75,10 @@ always @(posedge sys_clk) begin
             end
             else begin
                 rdy     <=  0;
-                datab   <=  {{24{1'b0}} , ones};
-                addrb   <=  addrb    +   15'd4;
+                if(ones != 8'b0) begin
+                    datab   <=  {{24{1'b0}} , ones};
+                    addrb   <=  addrb    +   15'd4;
+                end
             end
         end
         RUN_DONE    :   begin
